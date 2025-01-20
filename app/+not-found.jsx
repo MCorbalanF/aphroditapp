@@ -1,22 +1,24 @@
+import { useNavigation } from '@react-navigation/native';
 import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
 export default function NotFoundScreen() {
+  const navigate = useNavigation();
   return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
+    
+      <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 'auto' }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 'auto', gap: 20 }}>
+          <Text variant='displayLarge' >Oops!</Text>
+          <Button mode='contained' onPress={() => navigate.goBack()}>
+            Got to home page
+          </Button>
+        </View>
+      </ScrollView>
+  
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
