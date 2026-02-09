@@ -19,7 +19,6 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const paperTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
 
-
   return (
     <PaperProvider theme={DefaultTheme} >
       <ThemeProvider value={DefaultTheme}>
@@ -35,7 +34,7 @@ export default function RootLayout() {
         >
 
           <Drawer.Screen name="index" />
-          <Drawer.Screen  name="auth"   />
+          <Drawer.Screen name="auth" />
           <Drawer.Screen name="login" />
           <Drawer.Screen name="signin" />
 
@@ -44,4 +43,4 @@ export default function RootLayout() {
       </ThemeProvider>
     </PaperProvider>
   );
-}
+};
