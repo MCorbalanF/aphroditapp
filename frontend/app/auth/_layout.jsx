@@ -48,7 +48,7 @@ export default function LayoutAuth(props) {
                 }}
             />
             <Tab.Screen
-                name="User"
+                name="user"
                 component={Home}
                 options={{
                     tabBarIcon: prop => <Icon source='account' {...prop} />
@@ -152,34 +152,33 @@ const RelationshipItem = (props) => {
         <SwipeableItem
             key={item.key}
             item={item}
-          
+
             renderUnderlayLeft={(prop) => <UnderlayLeft {...prop} />}
             renderUnderlayRight={(prop) => <UnderlayRight {...prop} />}
-            renderOverlay={prop=>{
-                console.log(prop)
-                return(
-                    <Pressable {...prop}>
+            renderOverlay={prop => {
+                return (
 
-                
-                    <View  style={[styles.row, { height: 100, backgroundColor: '#00112266', justifyContent: 'space-between' }]}>
-    
-                    <IconButton icon='drag' onLongPress={drag} />
-                    <View >
-                        <Text >{`${item.name}`}</Text>
-                    </View>
-                    <IconButton icon='arrow-right' onLongPress={drag} />
-    
-                </View></Pressable>
+                    <List.Item
+                        {...prop}
+                        title={item.name}
+                        left={props => <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                            <IconButton icon='drag' onLongPress={drag} />
+                            <Avatar.Image size={50} source={{ uri: item.avatar }} />
+
+                        </View>}
+                        right={props => <IconButton icon='close' />}
+
+                    />
                 )
             }
 
-           
+
             }
-           
+
             snapPointsLeft={[150]}
             snapPointsRight={[150]}
         >
-          
+
 
         </SwipeableItem>
 
@@ -193,11 +192,11 @@ const UnderlayLeft = (props) => {
     return (
 
         <Pressable onPress={() => close()} style={[styles.row, styles.underlayLeft]}>
-            
-                <IconButton icon='close' />
-                <Text>close</Text>
 
-         
+            <IconButton icon='close' />
+            <Text>close</Text>
+
+
 
         </Pressable>
 
@@ -211,8 +210,8 @@ const UnderlayRight = () => {
 
         <Pressable onPress={() => close()} style={[styles.row, styles.underlayRight]}>
 
-                <IconButton icon='pencil' />
-                <Text>Pauperrimo</Text>
+            <IconButton icon='pencil' />
+            <Text>Pauperrimo</Text>
 
         </Pressable>
 

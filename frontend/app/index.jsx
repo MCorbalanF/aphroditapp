@@ -10,7 +10,8 @@ import {
     Portal,
     Text,
     Button,
-    TextInput
+    TextInput,
+    Appbar
 } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -98,7 +99,11 @@ function Landing() {
     return (
         <>
             <ScrollView contentContainerStyle={styles.main}>
-
+<Appbar >
+    <Appbar.Content title="Welcome to Aphroditapp" />
+    <Appbar.Action icon='close' onPress={() => {}} />
+    <Appbar.Content title="Welcome to Aphroditapp" />
+</Appbar>
                 <View style={styles.img}>
 
                     <Text variant='displayLarge' style={{textAlign:'center'}}  >Aphroditapp</Text>

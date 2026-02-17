@@ -34,8 +34,11 @@ export default function RootLayout() {
         >
 
           <Drawer.Screen name="index" />
+
           <Drawer.Screen name="auth" />
+
           <Drawer.Screen name="login" />
+          
           <Drawer.Screen name="signin" />
 
         </Drawer>
