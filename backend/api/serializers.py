@@ -127,16 +127,21 @@ class RelationshipMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = RelationshipMember
         fields = ['id', 'user', 'role', 'joined_at', 'nickname_for_me']
-
     def get_nickname_for_me(self, obj):
-        """Devuelve el apodo que el usuario actual le tiene puesto a este miembro."""
-        request_user = self.context.get('request').user
+        request = self.context.get("request")
+
+        if not request or not request.user or not request.user.is_authenticated:
+            return None
+
+        user = request.user
+
         nick = Nickname.objects.filter(
-            relationship=obj.relationship,
-            given_by=request_user,
-            given_to=obj.user,
+            given_by=user,
+            given_to=obj.user
         ).first()
+
         return nick.nickname if nick else None
+
 
 
 class RelationshipListSerializer(serializers.ModelSerializer):
@@ -159,11 +164,17 @@ class RelationshipListSerializer(serializers.ModelSerializer):
         return RelationshipMemberSerializer(members, many=True, context=self.context).data
 
     def get_my_role(self, obj):
-        user = self.context['request'].user
+        request = self.context.get("request")
+
+        if not request or not request.user or not request.user.is_authenticated:
+            return None
+
+        user = request.user
+
         membership = obj.memberships.filter(user=user).first()
         return membership.role if membership else None
-
-
+    
+    
 class RelationshipCreateSerializer(serializers.ModelSerializer):
     relationship_type_id = serializers.PrimaryKeyRelatedField(
         queryset=RelationshipType.objects.all(), source='relationship_type', write_only=True
@@ -493,3 +504,19 @@ class DashboardSerializer(serializers.Serializer):
     notifications = NotificationSerializer(many=True)
     pending_invitations = InvitationSerializer(many=True)
     unread_notification_count = serializers.IntegerField()
+    
+    
+class RelationshipTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RelationshipType
+        fields = ["id", "name", "icon", "description"]
+        
+class UserSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "avatar",
+        ]

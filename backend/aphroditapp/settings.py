@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -37,11 +36,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # ← IMPORTANTE
+    
+    # Third party
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
+    
+    # Auth social - ESTE ES EL QUE FALTA
+    'allauth',               # ← IMPORTANTE
+    'allauth.account',       # ← ESTE FALTABA
+    'allauth.socialaccount', # ← IMPORTANTE
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    
     'api'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  
+    # Other middlewares
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,8 +66,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # ← requerido por allauth
 ]
-
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8081',  # Allow requests from the React frontend
+    'https://your-frontend-domain.com',  # Production frontend domain
+]
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins (use with caution in production)
 ROOT_URLCONF = 'aphroditapp.urls'
 
 TEMPLATES = [
@@ -87,8 +109,20 @@ DATABASES = {
 AUTH_USER_MODEL = 'api.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication'],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
 }
 
 CHANNEL_LAYERS = {
@@ -109,6 +143,105 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),      # Access token expira en 1h
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),      # Refresh token expira en 7 días
+    'ROTATE_REFRESH_TOKENS': True,                    # Genera nuevo refresh al refrescar
+    'BLACKLIST_AFTER_ROTATION': True,                 # Blacklistea el refresh viejo
+    'UPDATE_LAST_LOGIN': True,
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+}
+
+
+
+# ==============================================================================
+# DJANGO ALLAUTH — OAuth social
+# ==============================================================================
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',      # Login normal
+    'allauth.account.auth_backends.AuthenticationBackend',  # OAuth
+]
+
+# Configuración de allauth
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # 'mandatory' en producción
+
+ACCOUNT_LOGIN_METHODS = {"email", "username"}
+ACCOUNT_SIGNUP_FIELDS = [
+    "email*",
+    "username*",
+    "password1*",
+    "password2*",
+]
+# OAuth Google
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': 'TU_GOOGLE_CLIENT_ID_AQUI',
+            'secret': 'TU_GOOGLE_SECRET_AQUI',
+            'key': ''
+        }
+    }
+}
+
+# Si quieres Apple Sign In en el futuro:
+# SOCIALACCOUNT_PROVIDERS['apple'] = {
+#     'APP': {
+#         'client_id': 'com.tuapp.service',
+#         'secret': 'TU_APPLE_SECRET',
+#         'key': 'TU_TEAM_ID',
+#         'certificate_key': '''-----BEGIN PRIVATE KEY-----
+# TU_PRIVATE_KEY_AQUI
+# -----END PRIVATE KEY-----'''
+#     }
+# }
+
+
+# ==============================================================================
+# DJ-REST-AUTH — Configuración
+# ==============================================================================
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False,  # True si usas cookies
+    'JWT_AUTH_COOKIE': 'auth-token',
+    'JWT_AUTH_REFRESH_COOKIE': 'refresh-token',
+}
+
+
+# ==============================================================================
+# MEDIA FILES — para subir avatares, fotos, etc.
+# ==============================================================================
+
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Internationalization

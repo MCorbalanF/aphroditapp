@@ -44,8 +44,9 @@ WebSocket (Django Channels):
   ws://host/ws/relationship/<rel_id>/content/<type>/<content_id>/
 """
 
-from django.urls import path
+from django.urls import path, include
 from . import views
+from rest_framework_simplejwt.views import TokenRefreshView
 
 app_name = "api"
 
@@ -61,6 +62,17 @@ urlpatterns = [
     path('auth/register/', views.RegisterView.as_view(), name='auth-register'),
     path('auth/login/', views.LoginView.as_view(), name='auth-login'),
     path('auth/logout/', views.LogoutView.as_view(), name='auth-logout'),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    
+        # ──────────────────────────────────────────────
+    # AUTH — OAuth Social (Google, Apple, etc.)
+    # ──────────────────────────────────────────────
+    # Esto incluye automáticamente:
+    #   POST /api/auth/social/google/
+    #   GET  /api/auth/social/google/callback/
+    #   Y lo mismo para otros providers
+    path('auth/social/', include('dj_rest_auth.registration.urls')),
+
 
     # ──────────────────────────────────────────────
     # DASHBOARD
@@ -108,4 +120,8 @@ urlpatterns = [
     # ──────────────────────────────────────────────
     path('notifications/', views.NotificationListView.as_view(), name='notification-list'),
     path('notifications/<uuid:notification_id>/read/', views.NotificationReadView.as_view(), name='notification-read'),
+
+    path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+    path("relationship-types/", views.RelationshipTypeListView.as_view(), name="relationship-types"),
+
 ]
