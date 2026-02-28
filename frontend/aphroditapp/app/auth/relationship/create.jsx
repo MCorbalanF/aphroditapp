@@ -34,7 +34,7 @@ export default function CreateScreen(props) {
 
 const NOTE_COLORS = [
     '#FFFFFF', '#FFD93D', '#FF6B9D', '#6BCB77', '#845EC2',
-    '#FF9671', '#4D96FF', '#FFF0F3', '#F4F4F9',
+    '#FF9671', '#4D96FF', '#a0e5ea', '#d4a2cc',
 ];
 
 function CreateNoteScreen({ navigation, route }) {
@@ -76,8 +76,8 @@ function CreateNoteScreen({ navigation, route }) {
             minHeight: 80, borderWidth: 1, borderColor: colors.border,
             elevation: 2,
         },
-        previewTitle: { fontSize: 14, fontWeight: '700', color: colors.text, marginBottom: 4 },
-        previewBody: { fontSize: 13, color: colors.textSecondary },
+        previewTitle: { fontSize: 14, fontWeight: '700', color: 'black', marginBottom: 4},
+        previewBody: { fontSize: 13, color: 'black' },
         btn: { borderRadius: 28, backgroundColor: colors.primary, elevation: 4, marginTop: spacing.md },
         btnContent: { height: 52 },
         btnLabel: { fontSize: 16, fontWeight: '700' },
@@ -656,7 +656,7 @@ function CreateListScreen({ navigation, route }) {
                                     <IconButton
                                         icon="plus"
                                         size={24}
-                                        iconColor="#FFF"
+                                        iconColor={colors.onSecondary}
                                         style={styles.addBtn}
                                         onPress={addItem}
                                     />

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native';
-import { Text, Card, FAB, IconButton, Chip, useTheme } from 'react-native-paper';
+import { Text, Card, FAB, IconButton, Chip, useTheme, Icon, Avatar } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { contentAPI } from '../../../api/content';
@@ -8,6 +8,7 @@ import EmptyState from '../../../components/common/EmptyState';
 import ErrorBanner from '../../../components/common/ErrorBanner';
 import { extractError } from '../../../api/axios';
 import { spacing } from '../../../constants/theme';
+import { useNavigation } from 'expo-router';
 
 const CREATE_SCREEN = {
   note: 'note',
@@ -39,8 +40,8 @@ const TYPE_COLOR = {
 
 
 export default function ContentListScreen(props) {
-  const { navigation, route } = props;
-  console.log('Route params:', props);
+  const { route } = props;
+  const navigation = useNavigation();
   const { id: relationshipId, type, data: initialData = [], name: typeName } = route.params;
   const [items, setItems] = useState(initialData);
   const [error, setError] = useState(null);
@@ -68,7 +69,7 @@ export default function ContentListScreen(props) {
         </Card.Content>
       </Card>
     );
-  }
+  };
 
   function EventCard({ item, onDelete }) {
     return (
@@ -79,61 +80,78 @@ export default function ContentListScreen(props) {
             <IconButton icon="delete-outline" size={18} iconColor={colors.error} onPress={onDelete} style={{ margin: 0 }} />
           </View>
           <View style={styles.eventRow}>
-            <MaterialCommunityIcons name="clock" size={14} color={colors.textSecondary} />
+            <Icon source="clock-outline" size={14} color={colors.textSecondary} />
             <Text style={styles.cardMeta}>{new Date(item.start_datetime).toLocaleString('es-ES')}</Text>
           </View>
           {item.location ? (
             <View style={styles.eventRow}>
-              <MaterialCommunityIcons name="map-marker" size={14} color={colors.textSecondary} />
+              <Icon source="map-marker" size={14} color={colors.textSecondary} />
               <Text style={styles.cardMeta} numberOfLines={1}>{item.location}</Text>
             </View>
           ) : null}
         </Card.Content>
       </Card>
     );
-  }
+  };
 
-  function GenericCard({ item, label, onPress, onDelete }) {
+  function GenericCard({ item, label, onPress, onDelete, icon }) {
     return (
-      <TouchableOpacity onPress={onPress}>
-        <Card style={styles.itemCard} mode="elevated">
-          <Card.Content>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle} numberOfLines={1}>{item.title || label}</Text>
-              <IconButton icon="delete-outline" size={18} iconColor={colors.error} onPress={onDelete} style={{ margin: 0 }} />
-            </View>
-            {item.description ? <Text style={styles.noteBody} numberOfLines={2}>{item.description}</Text> : null}
-            {item.completion_percentage !== undefined && (
-              <Chip compact icon="check" style={styles.progressChip} textStyle={{ fontSize: 11 }}>
-                {item.completion_percentage}% completado
-              </Chip>
-            )}
-            {item.items?.length > 0 && (
-              <Text style={styles.cardMeta}>{item.items.length} ítems</Text>
-            )}
-          </Card.Content>
-        </Card>
-      </TouchableOpacity>
+      <Card onPress={onPress} style={styles.itemCard} mode="contained">
+        <Card.Content >
+          <Card.Title
+            title={item.title || label}
+            subtitle={item.description}
+            subtitleStyle={styles.noteBody}
+            {...(icon &&{left:(props) =>  <Text style={{ fontSize: 24 }} {...props}>{icon}</Text>})}
+            right={prop =>
+              <IconButton
+                icon="delete-outline"
+                mode='contained-tonal'
+                size={18}
+                iconColor={colors.error}
+                onPress={onDelete}
+                style={{ margin: 0 }}
+              />
+            }
+          />
+
+
+
+          {item.completion_percentage !== undefined && (
+            <Chip compact icon="check" style={styles.progressChip} textStyle={{ fontSize: 11 }}>
+              {item.completion_percentage}% completado
+            </Chip>
+          )}
+          {item.items?.length > 0 && (
+            <Text style={styles.cardMeta}>{item.items.length} ítems</Text>
+          )}
+
+        </Card.Content >
+      </Card >
     );
-  }
+  };
+
+
   const renderItem = ({ item }) => {
     const onDelete = () => handleDelete(item.id);
     if (type === 'note') return <NoteCard item={item} onDelete={onDelete} />;
     if (type === 'event') return <EventCard item={item} onDelete={onDelete} />;
+    console.log(item)
     return (
       <GenericCard
         item={item}
         label={typeName}
         onDelete={onDelete}
+        icon={item.emoji}
         onPress={() => {
           if (DETAIL_SCREEN[type]) {
             navigation.navigateDeprecated('shared', {
               screen: DETAIL_SCREEN[type],
-              
-                item: item,
-                relationshipId: relationshipId,
-                type: DETAIL_SCREEN[type]
-              
+
+              item: item,
+              relationshipId: relationshipId,
+              type: DETAIL_SCREEN[type]
+
             });
           }
         }}
@@ -170,20 +188,27 @@ export default function ContentListScreen(props) {
       {CREATE_SCREEN[type] && (
         <FAB
           icon="plus"
+          color={colors.onPrimary}
           style={[styles.fab, { backgroundColor: TYPE_COLOR[type] || colors.primary }]}
-          onPress={() => navigation.navigate(CREATE_SCREEN[type], { relationshipId, onCreated: (item) => setItems((p) => [item, ...p]) })}
-          color="#FFF"
+          onPress={() => navigation.navigate('create',
+            {
+              screen: CREATE_SCREEN[type],
+              relationshipId: relationshipId,
+              type: CREATE_SCREEN[type]
+
+            }
+          )}
         />
       )}
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   list: { padding: spacing.md, flexGrow: 1, gap: spacing.sm, paddingBottom: 80 },
   itemCard: { borderRadius: 16 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xs },
+  cardHeader: { flexDirection: 'column', marginBottom: spacing.xs },
   cardTitle: { fontSize: 16, fontWeight: '700', flex: 1 },
   noteBody: { fontSize: 14, lineHeight: 20 },
   cardMeta: { fontSize: 12, marginTop: 4 },

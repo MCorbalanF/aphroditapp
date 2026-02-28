@@ -15,17 +15,20 @@ export default function LayoutRelationship(props) {
     const theme = useTheme();
     return (
         <Stack.Navigator
-            screenOptions={{
+    
+        screenOptions={{
                 header: prop => {
                     return (
                         <Appbar.Header style={{ backgroundColor: theme.colors.backdrop }} elevated={false}>
-                            {prop.back && <Appbar.Action icon='arrow-left' onPress={() => props.navigation.goBack()} />}
+                            {prop.back && <Appbar.Action icon='arrow-left' onPress={() => prop.navigation.goBack()} />}
                             <Appbar.Content title={prop.options.title || prop.route.name} />
                         </Appbar.Header>
                     )
                 },
                 headerShown: true,
+                
             }}
+            
 
         >
 
@@ -52,13 +55,7 @@ export default function LayoutRelationship(props) {
                 }}
             />
 
-            <Stack.Screen
-                name="create"
-                component={CreateScreen}
-                options={{
-                    title: 'Crear contenido compartido'
-                }}
-            />
+
             <Stack.Screen
                 name="list"
                 component={ListScreen}
@@ -73,7 +70,13 @@ export default function LayoutRelationship(props) {
                     title: prop.route.params?.type 
                 })}
             />
-
+            <Stack.Screen
+                name="create"
+                component={CreateScreen}
+                options={{
+                    title: 'Crear contenido compartido'
+                }}
+            />
         </Stack.Navigator>
     );
 };

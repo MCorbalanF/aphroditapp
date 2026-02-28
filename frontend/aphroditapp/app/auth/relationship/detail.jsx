@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
-import { Text, Card, Chip, Button, FAB, Portal, Dialog, Divider, Avatar, useTheme } from 'react-native-paper';
+import { Text, Card, Chip, Button, FAB, Portal, Dialog, Divider, Avatar, useTheme, Icon, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { relationshipsAPI } from '../../../api/relationships';
@@ -42,7 +42,7 @@ export default function RelationshipDetailScreen(props) {
     }
   }, [id]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [route.params?.id]);
 
   if (loading) return <LoadingOverlay />;
   if (!relationship) return (
@@ -69,22 +69,33 @@ export default function RelationshipDetailScreen(props) {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>👥 Miembros</Text>
                 {relationship.my_role === 'owner' && (
-                  <TouchableOpacity onPress={() => navigation.navigate('invite', { id, name })}>
-                    <MaterialCommunityIcons name="account-plus" size={22} color={colors.primary} />
-                  </TouchableOpacity>
+                  <IconButton
+                    icon="account-plus"
+                    size={22}
+                    color={colors.primary}
+                    onPress={() => navigation.navigate('invite', { id, name })}
+                  />
+
                 )}
               </View>
               <View style={styles.membersRow}>
                 {members.map((m) => (
-                  <View key={m.id} style={styles.memberItem}>
-                    <UserAvatar user={m.user} size={48} />
-                    <Text style={styles.memberName} numberOfLines={1}>{m.nickname_for_me || m.user?.username}</Text>
+                  <View key={m.id} style={[styles.memberItem, { maxWidth: members.length > 2 ? 46 : 80, position: 'relative' }]}>
+                    <UserAvatar user={m.user} size={members.length > 2 ? 32 : 68} />
+                    <Text style={styles.memberName} variant={members.length < 2 ? 'headlineLarge' : 'labelSmall'} numberOfLines={5}>
+                      {m.nickname_for_me || m.user?.username}
+                      {m.nickname_for_me && m.user?.username && `\n (${m.user.username})`}
+                    </Text>
                     {m.role === 'owner' && (
-                      <MaterialCommunityIcons name="crown" size={12} color={colors.accent} />
+                      <View style={{ position: 'absolute', top: -2, right: -2, backgroundColor: colors.backdrop, borderRadius: 9999, padding: 2 }}>
+                        <Icon source="crown" size={12} color={colors.accent} />
+                      </View>
                     )}
                   </View>
                 ))}
               </View>
+              <Card.Actions>
+
               <Button
                 mode="outlined"
                 compact
@@ -94,6 +105,8 @@ export default function RelationshipDetailScreen(props) {
               >
                 Gestionar apodos
               </Button>
+                            </Card.Actions>
+
             </Card.Content>
           </Card>
 
@@ -164,9 +177,9 @@ const styles = StyleSheet.create({
   card: { margin: spacing.md, marginBottom: 0, borderRadius: 20 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   sectionTitle: { fontSize: 16, fontWeight: '700' },
-  membersRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginBottom: spacing.sm },
-  memberItem: { alignItems: 'center', gap: 4, maxWidth: 60 },
-  memberName: { fontSize: 11, textAlign: 'center' },
+  membersRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.md, marginBottom: spacing.sm },
+  memberItem: { alignItems: 'center', gap: 4 },
+  memberName: { textAlign: 'center' },
   nicknameBtn: { alignSelf: 'flex-start', borderRadius: 20 },
   infoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, alignItems: 'center' },
   chipText: { fontSize: 12 },

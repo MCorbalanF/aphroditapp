@@ -82,7 +82,7 @@ function ChecklistDetailScreen({ navigation, route }) {
         headerCard: { margin: spacing.md, borderRadius: 20, backgroundColor: colors.surface },
         title: { fontSize: 20, fontWeight: '800', color: colors.text, marginBottom: spacing.xs },
         desc: { fontSize: 14, color: colors.textSecondary, marginBottom: spacing.sm },
-        progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+        progressRow: { flexDirection: 'column', alignItems: 'center', gap: spacing.sm },
         progressBar: { flex: 1, height: 8, borderRadius: 4 },
         progressText: { fontSize: 13, fontWeight: '700', color: colors.success, minWidth: 35 },
         list: { paddingHorizontal: spacing.md, gap: spacing.xs, paddingBottom: spacing.xl },
@@ -108,7 +108,12 @@ function ChecklistDetailScreen({ navigation, route }) {
                     <Text style={styles.title}>{checklist.title}</Text>
                     {checklist.description ? <Text style={styles.desc}>{checklist.description}</Text> : null}
                     <View style={styles.progressRow}>
-                        <ProgressBar progress={progress} color={colors.success} style={styles.progressBar} />
+                        <ProgressBar 
+                        progress={progress} 
+                        color={colors.success} 
+                        style={styles.progressBar} 
+                            visible={true}
+                        />
                         <Text style={styles.progressText}>{done}/{total}</Text>
                     </View>
                 </Card.Content>

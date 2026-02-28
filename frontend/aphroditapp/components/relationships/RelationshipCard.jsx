@@ -165,9 +165,9 @@ const styles = StyleSheet.create({
     //marginTop: spacing.xs,
   },
   memberAvatar: {
-    borderWidth: 2,
+    borderWidth: 4,
     //borderColor: colors.surface,
-    borderRadius: 14,
+    borderRadius: 9999,
   },
   moreMembersChip: {
     marginLeft: -8,

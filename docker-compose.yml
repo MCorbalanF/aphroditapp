@@ -1,0 +1,74 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: aphroditapp_db
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - aphroditapp_network
+
+
+      
+  api:
+      build:
+        context: ./backend
+        dockerfile: Dockerfile
+      container_name: aphroditapp_api
+      restart: unless-stopped
+      command: >
+        sh -c "
+          echo 'Esperando a que la base de datos esté lista...' &&
+          while ! nc -z db 5432; do sleep 1; done &&
+          echo 'Base de datos lista!' &&
+          python manage.py makemigrations --noinput &&
+          python manage.py migrate --noinput &&
+          python manage.py collectstatic --noinput --clear &&
+          gunicorn --bind 0.0.0.0:8001 --workers 3 --timeout 120 --access-logfile - --error-logfile - aphroditapp.wsgi:application
+        "
+      volumes:
+        - ./backend:/app
+      ports:
+        - "${API_PORT:-8001}:8001"
+
+      depends_on:
+        db:
+          condition: service_healthy
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8001/api/health/"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+      networks:
+        - aphroditapp_network
+        
+  frontend:
+    build:
+      context: ./frontend
+    container_name: aphroditapp_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - aphroditapp_network
+
+volumes:
+  postgres_data:
+
+networks:
+  aphroditapp_network:
+    driver: bridge

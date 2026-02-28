@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text, Button, Icon, useTheme, IconButton } from 'react-native-paper';
+import { Text, Button, Icon, useTheme } from 'react-native-paper';
 import {  spacing } from '../../constants/theme';
 
 export default function EmptyState({ icon = 'inbox', title, subtitle, action, onAction }) {

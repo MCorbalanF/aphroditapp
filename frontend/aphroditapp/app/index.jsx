@@ -1,28 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
-import { Text, Button, Surface, ActivityIndicator, useTheme } from 'react-native-paper';
+import { Text, Button, Surface, ActivityIndicator, useTheme, Icon } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { authAPI } from '../api/auth';
-import {  spacing } from '../constants/theme';
+import { spacing } from '../constants/theme';
 import IndexHeader from '@/components/nav/index_header';
 import logo from '../assets/images/logo.png'
+import LandingLogo from '../assets/images/landing.svg';
 import { useNavigation } from 'expo-router';
+import * as Application from 'expo-application';
 
 export default function LandingScreen(props) {
-  const [appInfo, setAppInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const theme = useTheme();
   const colors = theme.colors;
-  
-  useEffect(() => {
-    authAPI.getLanding()
-      .then((res) => setAppInfo(res.data.data))
-      .catch(() => { })
-      .finally(() => setLoading(false));
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,22 +32,19 @@ export default function LandingScreen(props) {
       <View style={styles.content}>
         {/* Hero section */}
         <View style={styles.hero}>
-          <Image
-            source={logo}
-            style={{
-              width: 300,
-              height: 300,
-              alignSelf: 'center',
-            }}
+      <Text style={styles.appName}>
+            {Application.applicationName || process.env.EXPO_PUBLIC_APP_NAME}
+          </Text>
+          <LandingLogo
+            width={400}
+            height={400}
+            fill={colors.primary}
           />
 
-          <Text style={styles.appName}>
-            {appInfo?.app || process.env.EXPO_PUBLIC_APP_NAME || 'Couples & Friends'}
-          </Text>
+    
           <Text style={styles.tagline}>
             Tu espacio compartido con las personas que más importan
           </Text>
-          {loading && <ActivityIndicator color="#FFF" style={{ marginTop: spacing.sm }} />}
         </View>
 
         {/* Features */}
@@ -66,7 +56,7 @@ export default function LandingScreen(props) {
             { icon: 'image-multiple', label: 'Momentos en fotos' },
           ].map((f) => (
             <View key={f.label} style={styles.featureItem}>
-              <MaterialCommunityIcons name={f.icon} size={20} color={colors.primary} />
+              <Icon source={f.icon} size={20} color={colors.primary} />
               <Text style={styles.featureText}>{f.label}</Text>
             </View>
           ))}
@@ -74,16 +64,16 @@ export default function LandingScreen(props) {
 
         {/* CTA buttons */}
         <View style={styles.cta}>
-           <Button
+          <Button
             mode="outlined"
             onPress={() => navigation.navigate('login')}
             style={styles.secondaryBtn}
             contentStyle={styles.btnContent}
             labelStyle={styles.secondaryBtnLabel}
           >
-            Ya tengo cuenta
+            Iniciar Sesión
           </Button>
-          
+
           <Button
             mode="contained"
             onPress={() => navigation.navigate('signin')}
@@ -93,12 +83,12 @@ export default function LandingScreen(props) {
           >
             Crear una cuenta
           </Button>
-         
+
         </View>
 
         {/* Version */}
-        {appInfo?.version && (
-          <Text style={styles.version}>v{appInfo.version}</Text>
+        {Application?.nativeApplicationVersion && (
+          <Text style={styles.version}>v{Application.nativeBuildVersion || ''}</Text>
         )}
       </View>
     </SafeAreaView>
@@ -108,7 +98,7 @@ export default function LandingScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   // backgroundColor: colors.background,
+    // backgroundColor: colors.background,
   },
   gradientBg: {
     ...StyleSheet.absoluteFillObject,

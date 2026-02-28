@@ -123,5 +123,6 @@ urlpatterns = [
 
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
     path("relationship-types/", views.RelationshipTypeListView.as_view(), name="relationship-types"),
+    path("health/", views.health, name="health"),
 
-]
+] 

@@ -35,6 +35,7 @@ Endpoints implementados:
   POST /notifications/read-all/   → marcar todas como leídas
   PATCH /notifications/<id>/read/ → marcar una como leída
 """
+from django.http import JsonResponse
 import re
 from django.db.models import Q
 from django.utils import timezone
@@ -412,3 +413,6 @@ class UserSearchView(ListAPIView):
 
         # Mezcla letras/números → username
         return base_queryset.filter(username__icontains=query)
+    
+def health(request):
+    return JsonResponse({"status": "ok"})
