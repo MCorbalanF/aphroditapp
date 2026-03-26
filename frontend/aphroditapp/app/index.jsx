@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, ScrollView } from 'react-native';
 import { Text, Button, Surface, ActivityIndicator, useTheme, Icon } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,7 +18,7 @@ export default function LandingScreen(props) {
   const colors = theme.colors;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
       <IndexHeader />
 
       {/* Background gradient */}
@@ -91,7 +91,7 @@ export default function LandingScreen(props) {
           <Text style={styles.version}>v{Application.nativeBuildVersion || ''}</Text>
         )}
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 
