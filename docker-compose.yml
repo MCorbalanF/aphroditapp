@@ -1,32 +1,36 @@
 services:
-
-  db:
-    image: postgres:15
-    container_name: aphroditapp_db
-    restart: always
+      
+  frontend:
+    build:
+      context: https://github.com/MCorbalanF/aphroditapp.git#main:frontend
+    container_name: aphroditapp_frontend
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
+      EXPO_PUBLIC_API_URL: http://aprhoditapp.ddns.net:8000/api
+      EXPO_PUBLIC_APP_NAME: Aphroditapp
+      EXPO_PUBLIC_APP_VERSION: 1.0.0
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
     networks:
       - aphroditapp_network
-
-
-      
+   
   api:
       build:
-        context: ./backend
+        context: https://github.com/MCorbalanF/aphroditapp.git#main:backend
         dockerfile: Dockerfile
       container_name: aphroditapp_api
       restart: unless-stopped
+      environment:
+        SECRET_KEY: django-insecure-y2wcye^hjy&3l1yif)9p!5_=!sistc7*)p$ar&nrh%w#%5rdrm
+        DEBUG: false
+        DB_NAME: db_aphroditapp
+        DB_USER: admin_db_aphroditapp
+        DB_PASSWORD: 4U?S7(e*aQ6*
+        DB_HOST: aphroditapp_db
+        DB_PORT: 5432
+        FRONTEND_URL: http://localhost
       command: >
         sh -c "
           echo 'Esperando a que la base de datos esté lista...' &&
@@ -53,16 +57,24 @@ services:
         start_period: 40s
       networks:
         - aphroditapp_network
-        
-  frontend:
-    build:
-      context: ./frontend
-    container_name: aphroditapp_frontend
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - api
+  
+
+  db:
+    image: postgres:15
+    container_name: aphroditapp_db
+    restart: always
+    environment:
+      POSTGRES_DB: db_aphroditapp
+      POSTGRES_USER: admin_db_aphroditapp
+      POSTGRES_PASSWORD: 4U?S7(e*aQ6*
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
     networks:
       - aphroditapp_network
 
