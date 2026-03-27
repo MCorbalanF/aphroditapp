@@ -157,7 +157,10 @@ export function AuthProvider({ children }) {
 
 
   //-----------------------------------------------------------------------------------------------------------------user Configuration
-  const systemTheme = useColorScheme(); // Oscuro o claro según el sistema
+    const systemTheme = useColorScheme(); // Oscuro o claro según el sistema
+
+  const [theme, setTheme] = useState(systemTheme);
+
   const locales = Localization.getLocales();
   const systemLanguage = locales[0]?.languageCode; // Idioma del dispositivo
   const finalTheme = theme || "auto";
@@ -169,7 +172,6 @@ export function AuthProvider({ children }) {
         : systemTheme === "dark"
           ? PaperDarkTheme
           : PaperLightTheme;
-  const [theme, setTheme] = useState(MDTheme);
 
   const [language, setLanguage] = useState(systemLanguage);
   const updateTheme = (newTheme) => {
