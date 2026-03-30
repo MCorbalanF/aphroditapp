@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image, ScrollView } from 'react-native';
-import { Text, Button, Surface, ActivityIndicator, useTheme, Icon } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { authAPI } from '../api/auth';
+import React from 'react';
+import { StyleSheet, View,  ScrollView } from 'react-native';
+import { Text, Button,  useTheme, Icon } from 'react-native-paper';
 import { spacing } from '../constants/theme';
 import IndexHeader from '@/components/nav/index_header';
-import logo from '../assets/images/logo.png'
 import LandingLogo from '../assets/images/landing.svg';
 import { useNavigation } from 'expo-router';
 import * as Application from 'expo-application';
@@ -234,73 +229,4 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
 });
-
-
-
-/*
-
-import { Image,  StyleSheet, useColorScheme, useWindowDimensions, View } from 'react-native';
-import {
-    useTheme, Text, Button,
-} from 'react-native-paper';
-
-import logo from '../assets/images/logo.png'
-import { useNavigation } from '@react-navigation/native';
-import IndexHeader from '@/components/nav/index_header';
-
-
-
-export default function LandingPage() {
-    const navigation = useNavigation();
-
-    const { width, height } = useWindowDimensions();
-    const isLargeScreen = width >= 768;
-    const mainTheme = useTheme();
-    const styles = StyleSheet.create({
-        main: {
-            width: width,
-            height: height,
-
-            gap: 10,
-            //backgroundColor: theme.colors.background
-        },
-        img: {
-            marginBottom: 30,
-            alignSelf: 'center',
-        }
-    });
-    return (
-
-        <View style={styles.main}>
-            <IndexHeader />
-            <View style={styles.img}>
-
-                <Text variant='displayLarge' style={{ textAlign: 'center', padding: 30 }}>Aphroditapp</Text>
-                <Image
-                    source={logo}
-                    style={{
-                        width: isLargeScreen ? 400 : 300,
-                        height: isLargeScreen ? 400 : 300
-                    }}
-                />
-
-
-            </View>
-            <View style={{ margin: 60, gap: 20 }}>
-                <Button mode='contained' onPress={() => navigation.navigate('login')}>
-                    I´m already a user
-                </Button>
-                <Button contentStyle={{ paddingHorizontal: 20 }} onPress={() => navigation.navigate('signin')} >
-                    Register
-                </Button>
-
-            </View>
-
-        </View>
-
-    );
-};
-
-
-*/
 

@@ -156,7 +156,7 @@ export function AuthProvider({ children }) {
 
 
   //-----------------------------------------------------------------------------------------------------------------user Configuration
-    const systemTheme = useColorScheme(); // Oscuro o claro según el sistema
+  const systemTheme = useColorScheme(); // Oscuro o claro según el sistema
 
   const [theme, setTheme] = useState(systemTheme);
 
@@ -175,7 +175,7 @@ export function AuthProvider({ children }) {
   const [language, setLanguage] = useState(systemLanguage);
   const updateTheme = (newTheme) => {
     setTheme(newTheme);
-    AsyncStorage.setItem("theme", newTheme);
+    //AsyncStorage.setItem("theme", newTheme);
   };
 
   return (
