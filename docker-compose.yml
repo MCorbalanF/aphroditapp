@@ -2,7 +2,7 @@ services:
       
   frontend:
     build:
-      context: https://github.com/MCorbalanF/aphroditapp.git#main:frontend
+      context: https://github.com/MCorbalanF/aphroditapp.git#master:frontend
     container_name: aphroditapp_frontend
     restart: unless-stopped
     environment:
@@ -17,46 +17,42 @@ services:
       - aphroditapp_network
    
   api:
-      build:
-        context: https://github.com/MCorbalanF/aphroditapp.git#main:backend
-        dockerfile: Dockerfile
-      container_name: aphroditapp_api
-      restart: unless-stopped
-      environment:
-        SECRET_KEY: django-insecure-y2wcye^hjy&3l1yif)9p!5_=!sistc7*)p$ar&nrh%w#%5rdrm
-        DEBUG: false
-        DB_NAME: db_aphroditapp
-        DB_USER: admin_db_aphroditapp
-        DB_PASSWORD: 4U?S7(e*aQ6*
-        DB_HOST: aphroditapp_db
-        DB_PORT: 5432
-        FRONTEND_URL: http://localhost
-      command: >
-        sh -c "
-          echo 'Esperando a que la base de datos esté lista...' &&
-          while ! nc -z db 5432; do sleep 1; done &&
-          echo 'Base de datos lista!' &&
-          python manage.py makemigrations --noinput &&
-          python manage.py migrate --noinput &&
-          python manage.py collectstatic --noinput --clear &&
-          gunicorn --bind 0.0.0.0:8001 --workers 3 --timeout 120 --access-logfile - --error-logfile - aphroditapp.wsgi:application
-        "
-      volumes:
-        - ./backend:/app
-      ports:
-        - "${API_PORT:-8001}:8001"
-
-      depends_on:
-        db:
-          condition: service_healthy
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8001/api/health/"]
-        interval: 30s
-        timeout: 10s
-        retries: 3
-        start_period: 40s
-      networks:
-        - aphroditapp_network
+    build:
+      context: https://github.com/MCorbalanF/aphroditapp.git#master:backend
+      dockerfile: Dockerfile
+    container_name: aphroditapp_api
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: django-insecure-y2wcye^hjy&3l1yif)9p!5_=!sistc7*)p$ar&nrh%w#%5rdrm
+      DEBUG: false
+      DB_NAME: db_aphroditapp
+      DB_USER: admin_db_aphroditapp
+      DB_PASSWORD: 4U?S7(e*aQ6*
+      DB_HOST: db
+      DB_PORT: 5432
+      FRONTEND_URL: http://localhost
+    command: >
+      sh -c "
+        echo 'Esperando a la DB...' &&
+        while ! nc -z db 5432; do sleep 1; done &&
+        echo 'DB lista!' &&
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput --clear &&
+        gunicorn --bind 0.0.0.0:8001 aphroditapp.wsgi:application
+      "
+    ports:
+      - "${API_PORT:-8001}:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - aphroditapp_network
   
 
   db:
@@ -70,11 +66,10 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U admin_db_aphroditapp"]
       interval: 5s
       timeout: 5s
       retries: 5
-
     networks:
       - aphroditapp_network
 
