@@ -17,7 +17,7 @@ apiClient.interceptors.request.use(
   async (config) => {
     try {
       const token = await storageService.get('auth_token');
-      console.log(token);
+      //console.log(token);
       console.log('Attaching token to request:', token ? 'Yes' : 'No');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

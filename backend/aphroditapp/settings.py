@@ -29,6 +29,7 @@ DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = [
     'http://localhost:8000',
+    '127.0.0.1',
     os.getenv('BACKEND_URL')
 ]
 
@@ -76,8 +77,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8081',  # Allow requests from the React frontend
-    os.getenv('FRONTEND_URL'),  # Production frontend domain
+   'http://localhost:8081',  # Allow requests from the React frontend
+   
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins (use with caution in production)
